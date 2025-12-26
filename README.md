@@ -1,4 +1,4 @@
-# Scrabble Player Rating Prediction: AutoML vs Custom Pipeline
+# Scrabble Player Rating Prediction: AutoML
 
 Прогнозирование рейтинга игроков на основе игрового процесса Woogles.io
 
@@ -84,7 +84,7 @@
 | Pipeline 3 | Simple Ensemble (LGBM + CatBoost) | 107.47 | 78.32 | 0.7844 | 2.34 сек | ✅ Beat LAMA |
 | Pipeline 2 | CatBoost + Preprocessing | 109.17 | 79.64 | 0.7775 | 1.41 сек | ✅ Beat LAMA |
 | LAMA Config 2 | AutoML (Extended) | 124.78 | 95.37 | 0.7093 | 268.30 сек | Baseline |
-| LAMA Config 1 | AutoML (Default) | 124.88 | 95.47 | 0.7088 | 149.94 сек | Baseline |
+| LAMA Config 1 | AutoML (Default) | 124.86 | 95.47 | 0.7089 | 130.67 сек | Baseline |
 
 > **Результаты:** Все кастомные пайплайны превзошли бейзлайн LightAutoML. Лучший результат (Pipeline 4) улучшил RMSE на **21.08%** по сравнению с LAMA Config 1.
 
