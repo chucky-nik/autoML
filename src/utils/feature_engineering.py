@@ -100,7 +100,7 @@ def create_additional_features(
 
 def classify_features(df: pd.DataFrame, target_col: str = 'rating') -> Dict[str, List[str]]:
     """
-    Классифицирует признаки по типам.
+    Классифицирует признаки по типам с учетом кардинальности и смысла признака.
     
     Parameters
     ----------
@@ -117,13 +117,35 @@ def classify_features(df: pd.DataFrame, target_col: str = 'rating') -> Dict[str,
     numeric_features = []
     categorical_features = []
     datetime_features = []
+    id_features = []  # ID-подобные признаки (исключаются из моделирования)
+    temporal_features = []  # Временные признаки (hour, day_of_week, month)
     
     for col in df.columns:
         if col == target_col:
             continue
         
+        # Проверяем на ID-подобные признаки (исключаем из моделирования)
+        if 'id' in col.lower() or col.lower().endswith('_id'):
+            id_features.append(col)
+            continue
+        
+        # Проверяем на временные признаки (созданные из datetime)
+        if col in ['hour', 'day_of_week', 'month', 'day', 'year', 'week']:
+            temporal_features.append(col)
+            categorical_features.append(col)  # Временные признаки - категориальные
+            continue
+        
         if df[col].dtype in ['int64', 'float64']:
-            numeric_features.append(col)
+            # Проверяем кардинальность для int признаков
+            unique_count = df[col].nunique()
+            total_count = len(df[col].dropna())
+            
+            # Если уникальных значений мало относительно общего количества - категориальный
+            # Порог: менее 20 уникальных значений И менее 10% от общего количества
+            if unique_count < 20 and total_count > 0 and unique_count / total_count < 0.1:
+                categorical_features.append(col)
+            else:
+                numeric_features.append(col)
         elif df[col].dtype == 'object':
             # Check if it's datetime
             if 'date' in col.lower() or 'time' in col.lower():
@@ -136,6 +158,8 @@ def classify_features(df: pd.DataFrame, target_col: str = 'rating') -> Dict[str,
     return {
         'numeric': numeric_features,
         'categorical': categorical_features,
-        'datetime': datetime_features
+        'datetime': datetime_features,
+        'id': id_features,  # Исключаем из моделирования
+        'temporal': temporal_features  # Временные признаки (категориальные)
     }
 
